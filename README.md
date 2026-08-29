@@ -84,23 +84,18 @@ Enseñar los conceptos fundamentales de pandas de manera práctica e interactiva
 
 ## Estructura del Proyecto
 
+
 ```
 Default Project/
-├── pandas_playground.html          # Archivo principal (HTML/CSS/JS)
-├── PANDAS_PLAYGROUND_DOCS.md       # Esta documentación
-├── curso_pandas_final.html         # Curso teórico (14 lecciones)
-├── curso_pandas_auditoria.html     # Versión sin quizzes
-├── python_pandas_extracted.txt     # Extracción del PDF
-└── pandas_info_detallada.txt       # Info organizada de pandas
-```
+├── index.html          # Archivo principal (HTML/CSS/JS)
 
+```
 ### Archivos Principales
 
 | Archivo | Descripción | Tamaño Aprox. |
 |---------|-------------|---------------|
-| `pandas_playground.html` | Aplicación interactiva completa | ~50KB |
-| `curso_pandas_final.html` | Curso teórico con quizzes | ~80KB |
-| `curso_pandas_auditoria.html` | Versión auditoría del curso | ~70KB |
+| `index_html` | Aplicación interactiva completa | ~50KB |
+
 
 ---
 
@@ -545,7 +540,9 @@ const completed = JSON.parse(localStorage.getItem('pandasCompleted')) || [];
 
 ## Créditos
 
-### Tecnologías
+Diseñado y desplegado por: Marco Antonio Marte Rodriguez.
+
+### Tecnologías implementadas
 
 - **Pyodide**: https://pyodide.org/
 - **Monaco Editor**: https://microsoft.github.io/monaco-editor/
