@@ -2,7 +2,7 @@
 
 Plataforma web interactiva para aprender pandas de forma práctica. El usuario escribe código Python en el navegador y lo ejecuta contra tests automáticos.
 
-**Versión**: 1.32.5 | **Última actualización**: Agosto 2026
+**Versión**: 1.34.0 | **Última actualización**: Agosto 2026
 
 ---
 
@@ -13,10 +13,11 @@ Plataforma web interactiva para aprender pandas de forma práctica. El usuario e
 | HTML5 | - | Estructura |
 | CSS3 | - | Estilos y responsive |
 | JavaScript | - | Lógica de la aplicación |
-| Pyodide | v0.25.0 | Python en WebAssembly |
+| Pyodide | v0.26.4 | Python en WebAssembly |
 | Monaco Editor | v0.45.0 | Editor de código (el mismo de VS Code) |
-| xterm.js | v5.5.0 | Terminal de salida |
 | pandas | - | Librería de análisis de datos |
+| jinja2 | - | Requerido por `df.style` (Styler) |
+| Service Worker | - | Caché de archivos estáticos |
 
 ---
 
@@ -28,12 +29,14 @@ Pandas Playground/
 ├── principiante.html             # Grid de lecciones principiante
 ├── intermedio.html               # Grid de lecciones intermedio
 ├── avanzado.html                 # Grid de lecciones avanzado
+├── desafio.html                  # Desafío final (3 retos)
 ├── lecciones_principiante.html   # Playground principiante
 ├── lecciones_intermedio.html     # Playground intermedio
 ├── lecciones_avanzado.html       # Playground avanzado
+├── sw.js                         # Service Worker (caché)
 ├── requirements.txt              # Dependencias Python
-├── DOCUMENTACION.md              # Esta documentación
-└── pandas_playground_docs.pdf    # Documentación en PDF
+├── README.md                     # Esta documentación
+└── DOCUMENTACION.md              # Documentación técnica
 ```
 
 ---
@@ -41,24 +44,26 @@ Pandas Playground/
 ## Niveles de Aprendizaje
 
 ### Principiante 🟢
-- **Color**: Verde (#00d4aa)
-- **Lecciones**: 14
-- **Tests**: 43
-- **Temas**: Importar, Series, DataFrame, CSV, filtrado, estadísticas, ordenamiento, groupby, limpieza
+- **Color**: Verde (#00d4aa) + Morado (#667eea)
+- **Lecciones**: 15
+- **Temas**: Importar, set_option, Series, DataFrame, CSV, filtrado, estadísticas, ordenamiento, groupby, limpieza
 
 ### Intermedio 🟠
-- **Color**: Naranja (#f39c12)
+- **Color**: Naranja (#d68910)
 - **Lecciones**: 13
-- **Tests**: 39
-- **Temas**: Merge/Join, Pivot Tables, Time Series, Multi-Index
+- **Temas**: Merge/Join, Pivot Tables, Melt, Time Series, Multi-Index, Stack/Unstack
 
 ### Avanzado 🔴
 - **Color**: Rojo (#e74c3c)
 - **Lecciones**: 13
-- **Tests**: 39
-- **Temas**: Chunking, Performance, Custom Functions, Sparse
+- **Temas**: Chunking, Performance, Custom Functions, nlargest/nsmallest, Pivot Tables, Explode, Rolling Windows, Crosstab, Styler, Query, Eval, Assign, Pipe
 
-**Total: 40 lecciones, 121 tests**
+### Desafío 🟣
+- **Color**: Morado (#667eea → #764ba2)
+- **Retos**: 3
+- **Retos**: Limpieza de Datos, Análisis de Ventas, Pipeline Completo
+
+**Total: 54 lecciones + 3 desafíos**
 
 ---
 
@@ -68,10 +73,12 @@ Pandas Playground/
 - Monaco Editor con syntax highlighting para Python
 - Números de línea y autocompletado
 - Indentación automática
+- Atajos: Ctrl+Enter (ejecutar), Ctrl+S (solución)
 
-### Terminal de Salida
-- xterm.js para visualizar resultados
-- Captura de `print()` y errores
+### Panel de Salida (Jupyter-style)
+- Tablas HTML estilizadas para DataFrames y Series
+- Detección automática de DataFrames en el scope
+- Salida de texto para `print()` y errores
 - Colores ANSI (errores en rojo)
 - Botón para limpiar
 
@@ -91,60 +98,10 @@ Pandas Playground/
 - Indicadores visuales por nivel
 - Persiste entre sesiones
 
----
-
-## Atajos de Teclado
-
-| Atajo | Función |
-|-------|---------|
-| `Ctrl+Enter` | Ejecutar tests |
-| `Ctrl+S` | Mostrar solución |
-| `Escape` | Cerrar modal |
-
----
-
-## Cómo Funciona
-
-1. El usuario selecciona un nivel
-2. Elige una lección del grid
-3. Escribe código en el editor
-4. Los `print()` aparecen en la terminal
-5. Ejecuta tests con Ctrl+Enter
-6. Si pasa, avanza al siguiente paso
-7. El progreso se guarda automáticamente
-
----
-
-## Instalación
-
-Es un proyecto **100% estático**. Solo necesitas abrir `index.html` en un navegador.
-
-No requiere:
-- Servidor backend
-- Node.js
-- Python instalado
-- Base de datos
-
-Requiere:
-- Conexión a internet (para cargar dependencias CDN)
-- Navegador moderno (Chrome, Firefox, Safari, Edge)
-
----
-
-## Dependencias CDN
-
-```html
-<!-- Pyodide - Python en WebAssembly -->
-<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
-
-<!-- Monaco Editor - Editor de código -->
-<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
-
-<!-- xterm.js - Terminal de salida -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
-```
+### Optimizaciones de Rendimiento
+- **Service Worker**: Caché de archivos estáticos para carga instantánea en visitas posteriores
+- **Precarga de Pyodide**: Se descarga en index.html en background
+- **Carga paralela**: pandas + jinja2 se descargan en paralelo (sin micropip)
 
 ---
 
@@ -155,6 +112,67 @@ Requiere:
 | `pandasCompleted` | Lecciones principiante completadas |
 | `pandasCompletedIntermedio` | Lecciones intermedio completadas |
 | `pandasCompletedAvanzado` | Lecciones avanzado completadas |
+| `pandasDesafioCompleted` | Desafíos completados |
+
+---
+
+## Dependencias CDN
+
+```html
+<!-- Pyodide - Python en WebAssembly -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+
+<!-- Monaco Editor - Editor de código -->
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+```
+
+### Paquetes Pyodide (carga en paralelo)
+```javascript
+await pyodide.loadPackage(["pandas", "jinja2"]);
+```
+
+---
+
+## Instalación
+
+Es un proyecto **100% estático**. Para desarrollo local:
+
+```bash
+# Opción 1: Python
+python -m http.server 8000
+
+# Opción 2: Node.js
+npx serve .
+```
+
+Luego abrí `http://localhost:8000` en tu navegador.
+
+**Para producción**: Subí los archivos a Vercel, Netlify, GitHub Pages o cualquier hosting estático.
+
+No requiere:
+- Servidor backend
+- Node.js
+- Python instalado
+- Base de datos
+
+Requiere:
+- Conexión a internet (primera visita para descargar Pyodide/pandas)
+- Navegador moderno (Chrome 80+, Firefox 78+, Safari 14+, Edge 80+)
+
+---
+
+## Cómo Funciona
+
+1. El usuario selecciona un nivel (o el Desafío)
+2. Elige una lección del grid
+3. Pyodide + pandas + jinja2 se cargan en background
+4. Escribe código en el editor Monaco
+5. Los DataFrames se muestran como tablas HTML
+6. Los `print()` aparecen como texto
+7. Ejecuta tests con Ctrl+Enter
+8. Si pasa, se marca como completada
+9. El progreso se guarda automáticamente en localStorage
+10. En visitas posteriores, la caché del Service Worker acelera la carga
 
 ---
 
@@ -169,28 +187,5 @@ Requiere:
 
 ---
 
-## Fuentes de Información
+*Versión 1.34.0 - Agosto 2026*
 
-Las lecciones fueron extraídas de la documentación oficial de pandas:
-
-### Principiante
-- [10 Minutes to pandas](https://pandas.pydata.org/docs/user_guide/10min.html)
-- [Intro to data structures](https://pandas.pydata.org/docs/user_guide/dsintro.html)
-- [Essential basic functionality](https://pandas.pydata.org/docs/user_guide/basics.html)
-- [IO tools (text, CSV, HDF5)](https://pandas.pydata.org/docs/user_guide/io.html)
-
-### Intermedio
-- [Merge, join, concatenate and compare](https://pandas.pydata.org/docs/user_guide/merging.html)
-- [Reshaping and pivot tables](https://pandas.pydata.org/docs/user_guide/reshaping.html)
-- [Time series / date functionality](https://pandas.pydata.org/docs/user_guide/timeseries.html)
-- [MultiIndex / advanced indexing](https://pandas.pydata.org/docs/user_guide/advanced.html)
-
-### Avanzado
-- [Scaling to large datasets - Chunking](https://pandas.pydata.org/docs/user_guide/scale.html#use-chunking)
-- [Scaling to large datasets - Efficient datatypes](https://pandas.pydata.org/docs/user_guide/scale.html#use-efficient-datatypes)
-- [User-Defined Functions (UDFs)](https://pandas.pydata.org/docs/user_guide/user_defined_functions.html)
-- [Sparse data structures](https://pandas.pydata.org/docs/user_guide/sparse.html)
-
----
-
-*Versión 1.32.5 - Agosto 2026*
