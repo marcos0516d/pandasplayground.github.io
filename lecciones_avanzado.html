@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Playground - Nivel Avanzado</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --azul: #0a0a23;
+            --verde: #00d4aa;
+            --naranja: #e74c3c;
+            --naranja-claro: #c0392b;
+            --gris-claro: #f8f9fa;
+            --gris-medio: #e9ecef;
+            --texto: #333;
+            --blanco: #fff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gris-claro);
+            color: var(--texto);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--azul);
+            color: var(--blanco);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 50px;
+        }
+        
+        .header-logo {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--verde);
+        }
+        
+        .header-steps {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 50px);
+        }
+
+        .instructions-panel {
+            width: 40%;
+            min-width: 300px;
+            background: var(--blanco);
+            border-right: 2px solid var(--gris-medio);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .instructions-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--gris-medio);
+            background: var(--gris-claro);
+        }
+        
+        .instructions-header h2 {
+            font-size: 1.1rem;
+            color: var(--azul);
+        }
+        
+        .instructions-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .instructions-content h3 {
+            color: var(--naranja);
+            margin: 15px 0 10px;
+            font-size: 1rem;
+        }
+        
+        .instructions-content p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .instructions-content code {
+            background: #f1f3f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9em;
+        }
+        
+        .instructions-content pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .instructions-content pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .editor-header {
+            padding: 10px 15px;
+            background: #282c34;
+            color: #abb2bf;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        
+        .editor-container {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .test-panel {
+            height: 150px;
+            min-height: 100px;
+            background: #1e1e1e;
+            border-top: 2px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .test-header {
+            padding: 8px 15px;
+            background: #252526;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        
+        .test-results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+        
+        /* OUTPUT PANEL - Jupyter Style */
+        .output-panel {
+            height: 220px;
+            min-height: 150px;
+            background: #1e1e1e;
+            border-top: 2px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .output-header {
+            padding: 8px 15px;
+            background: #252526;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+        
+        .output-header span:first-child {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .output-clear {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .output-clear:hover {
+            background: #3c3c3c;
+            color: #fff;
+        }
+        
+        .next-lesson-btn {
+            background: var(--verde);
+            color: var(--azul);
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .next-lesson-btn:disabled {
+            background: #3c3c3c;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .next-lesson-btn:not(:disabled):hover {
+            background: #00b894;
+        }
+        
+        .next-lesson-btn:not(:disabled) {
+            animation: glow 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px var(--verde), 0 0 10px var(--verde); }
+            50% { box-shadow: 0 0 15px var(--verde), 0 0 25px var(--verde); }
+        }
+        
+        .output-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .output-cell {
+            margin-bottom: 10px;
+            border-left: 3px solid var(--morado);
+            padding-left: 10px;
+        }
+        
+        .output-cell-prompt {
+            color: #61afef;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+        
+        .output-cell-text {
+            color: #abb2bf;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .output-cell-text.error {
+            color: #e06c75;
+        }
+        
+        .output-cell-html {
+            color: #abb2bf;
+            overflow-x: auto;
+        }
+        
+        .output-cell-html table {
+            border-collapse: collapse;
+            width: auto;
+            font-size: 0.85rem;
+            margin: 5px 0;
+        }
+        
+        .output-cell-html th,
+        .output-cell-html td {
+            border: 1px solid #444;
+            padding: 6px 10px;
+            text-align: left;
+        }
+        
+        .output-cell-html th {
+            background: #2c2c2c;
+            font-weight: 600;
+            color: #abb2bf;
+        }
+        
+        .output-cell-html tr:nth-child(even) {
+            background: #252526;
+        }
+        
+        .output-welcome {
+            color: #61afef;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+        
+        .output-welcome span {
+            color: #98c379;
+        }
+
+        .test-pass { color: #98c379; }
+        .test-fail { color: #e06c75; }
+        .test-info { color: #61afef; }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--naranja);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--naranja-claro);
+        }
+        
+        .btn-success {
+            background: var(--verde);
+            color: var(--azul);
+        }
+        
+        .btn-success:hover {
+            background: #00b894;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: var(--verde);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1rem;
+        }
+        
+        .loading-subtext {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .loading-progress {
+            width: 250px;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .loading-progress-bar {
+            height: 100%;
+            background: var(--verde);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .step-nav {
+            display: flex;
+            gap: 5px;
+            padding: 10px 15px;
+            background: var(--gris-claro);
+            border-bottom: 1px solid var(--gris-medio);
+            overflow-x: auto;
+        }
+        
+        .step-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--gris-medio);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .step-dot.active {
+            background: var(--naranja);
+            color: white;
+        }
+        
+        .step-dot.completed {
+            background: var(--verde);
+            color: var(--azul);
+        }
+        
+        .step-dot:hover {
+            transform: scale(1.1);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--blanco);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: modalIn 0.3s ease;
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            color: var(--azul);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .modal-message {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .modal-details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
+            color: #e06c75;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .modal-btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            background: var(--naranja);
+            color: white;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn:hover {
+            background: var(--naranja-claro);
+        }
+
+        .solution-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .solution-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .solution-btn:active {
+            transform: translateY(0);
+        }
+
+        .guide-link {
+            display: block;
+            text-align: center;
+            color: var(--naranja);
+            font-size: 0.85rem;
+            text-decoration: none;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .guide-link:hover {
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .guide-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            padding: 20px;
+        }
+        
+        .guide-modal-overlay.active {
+            display: flex;
+        }
+        
+        .guide-modal {
+            background: var(--blanco);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            animation: modalIn 0.3s ease;
+        }
+        
+        .guide-modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--gris-medio);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .guide-modal-header h2 {
+            font-size: 1.3rem;
+            color: var(--azul);
+            margin: 0;
+        }
+        
+        .guide-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            padding: 5px;
+            line-height: 1;
+        }
+        
+        .guide-close-btn:hover {
+            color: #333;
+        }
+        
+        .guide-modal-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+        }
+        
+        .guide-section {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--gris-medio);
+        }
+        
+        .guide-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .guide-section h3 {
+            color: var(--naranja);
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .guide-section p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .guide-section pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+        
+        .guide-section code {
+            font-family: 'Consolas', monospace;
+        }
+        
+        .guide-section .inline-code {
+            background: #f1f3f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #e06c75;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .instructions-panel {
+                width: 100%;
+                min-width: unset;
+                max-height: 45vh;
+                border-right: none;
+                border-bottom: 2px solid var(--gris-medio);
+            }
+            .editor-panel { min-height: 55vh; }
+            .test-panel { height: 120px; min-height: 80px; }
+            .header {
+                flex-wrap: wrap;
+                gap: 8px;
+                height: auto;
+                padding: 10px 15px;
+            }
+            .header-steps { order: 3; width: 100%; text-align: center; font-size: 0.8rem; }
+            .header-buttons { gap: 5px; }
+            .btn { padding: 6px 12px; font-size: 0.8rem; }
+            .step-nav { padding: 8px 10px; }
+            .step-dot { width: 26px; height: 26px; font-size: 0.7rem; }
+            .instructions-content { padding: 15px; }
+            .guide-modal { max-width: 95%; max-height: 90vh; }
+            .guide-modal-content { padding: 15px; }
+            .guide-section h3 { font-size: 1rem; }
+            .guide-section pre { font-size: 0.75rem; padding: 10px; }
+            .output-panel {
+                height: 180px;
+                min-height: 120px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header-logo { font-size: 1rem; }
+            .instructions-panel { max-height: 40vh; }
+            .editor-panel { min-height: 60vh; }
+            .editor-header { font-size: 0.75rem; padding: 8px 10px; }
+            .test-header { font-size: 0.75rem; padding: 6px 10px; }
+            .test-results { font-size: 0.75rem; padding: 8px 10px; }
+            .guide-modal-header { padding: 15px; }
+            .guide-modal-header h2 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Cargando entorno de Python...</div>
+        <div class="loading-subtext" id="loadingStatus">Inicializando Pyodide</div>
+        <div class="loading-progress">
+            <div class="loading-progress-bar" id="loadingProgressBar"></div>
+        </div>
+    </div>
+
+    <!-- ERROR MODAL -->
+    <div class="modal-overlay" id="errorModal">
+        <div class="modal">
+            <div class="modal-icon">⚠️</div>
+            <div class="modal-title">Revisa bien tu código</div>
+            <div class="modal-message">Algo no está bien escrito. Revisa la sintaxis y vuelve a intentar.</div>
+            <div class="modal-details" id="modalDetails"></div>
+            <button class="modal-btn" onclick="closeModal()">Entendido</button>
+        </div>
+    </div>
+
+    <!-- GUIDE MODAL -->
+    <div class="guide-modal-overlay" id="guideModal">
+        <div class="guide-modal">
+            <div class="guide-modal-header">
+                <h2>📖 Guía de Pandas Avanzado</h2>
+                <button class="guide-close-btn" onclick="closeGuide()">&times;</button>
+            </div>
+            <div class="guide-modal-content">
+                <div class="guide-section">
+                    <h3>pd.read_csv() con chunksize</h3>
+                    <p>Permite leer archivos CSV enormes por bloques, evitando sobrecargar la memoria.</p>
+                    <pre><code>for chunk in pd.read_csv('ventas.csv', chunksize=1000):
+    procesar(chunk)</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>Dtype category</h3>
+                    <p>Reduce el uso de memoria convirtiendo columnas con pocos valores únicos a tipo <code>category</code>.</p>
+                    <pre><code>df['genero'] = df['genero'].astype('category')</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>apply() con UDFs</h3>
+                    <p>Aplica funciones personalizadas fila por fila o columna por columna.</p>
+                    <pre><code>def clasificar(precio):
+    if precio < 50: return 'Barato'
+    elif precio < 200: return 'Medio'
+    return 'Caro'
+
+df['clasificacion'] = df['precio'].apply(clasificar)</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>nlargest / nsmallest</h3>
+                    <p>Obtiene los N valores más grandes o más pequeños de forma eficiente.</p>
+                    <pre><code>top3 = df.nlargest(3, 'ventas')
+bottom3 = df.nsmallest(3, 'ventas')</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>pd.pivot_table()</h3>
+                    <p>Crea tablas dinámicas con agregación (sum, mean, count, etc.).</p>
+                    <pre><code>tabla = pd.pivot_table(df, values='precio',
+    index='categoria', aggfunc='sum')</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>df.explode()</h3>
+                    <p>Transforma listas en filas separadas.</p>
+                    <pre><code>df = pd.DataFrame({'productos': [['A','B'], ['C']]})
+df_exploded = df.explode('productos')</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>Window functions</h3>
+                    <p>Funciones de ventana: rolling, expanding, ewm para cálculos acumulativos.</p>
+                    <pre><code>df['media_movil'] = df['ventas'].rolling(3).mean()
+df['acumulado'] = df['ventas'].expanding().sum()</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>pd.crosstab()</h3>
+                    <p>Tablas de frecuencia cruzada entre dos columnas categóricas.</p>
+                    <pre><code>tabla = pd.crosstab(df['categoria'], df['ciudad'])</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>DataFrame Styler</h3>
+                    <p>Aplica estilos visuales a DataFrames para visualización.</p>
+                    <pre><code>df.style.background_gradient(subset=['precio'])
+df.style.highlight_max()</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>df.query()</h3>
+                    <p>Filtra filas usando una expresión en lenguaje natural de pandas.</p>
+                    <pre><code>resultado = df.query('precio > 50 and cantidad > 10')</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>df.eval()</h3>
+                    <p>Evalúa expresiones matemáticas de forma rápida sobre columnas.</p>
+                    <pre><code>df.eval('total = cantidad * precio', inplace=True)</code></pre>
+                </div>
+
+                <div class="guide-section">
+                    <h3>df.assign()</h3>
+                    <p>Crea nuevas columnas encadenando asignaciones sin modificar el original.</p>
+                    <pre><code>df_result = df.assign(
+    impuesto = df['precio'] * 0.21,
+    total = df['precio'] * 1.21
+)</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <a href="index.html" class="header-logo" style="text-decoration:none;">🐼 Pandas Playground <span style="color: var(--naranja);">- Nivel Avanzado</span></a>
+        <div class="header-steps" id="stepInfo">Lección 1 de 13</div>
+        <div class="header-buttons">
+            <a href="intermedio.html" class="btn btn-secondary" style="text-decoration:none;">← Volver</a>
+            <button class="btn btn-secondary" onclick="resetCode()">🔄 Reiniciar</button>
+            <button class="btn btn-primary" onclick="runTests()">▶ Ejecutar Test (Ctrl+Enter)</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <!-- LEFT: INSTRUCTIONS -->
+        <div class="instructions-panel">
+            <div class="step-nav" id="stepNav"></div>
+            <div class="instructions-header">
+                <h2 id="lessonTitle">Lección 1: Chunking</h2>
+            </div>
+            <div class="instructions-content" id="instructionsContent"></div>
+            <div style="padding: 15px 20px; border-top: 1px solid var(--gris-medio);">
+                <a href="javascript:void(0)" class="guide-link" onclick="openGuide()">📖 Guía Informativa</a>
+                <button class="solution-btn" onclick="showSolution()">💡 Solución (Ctrl+S)</button>
+            </div>
+        </div>
+
+        <!-- RIGHT: EDITOR + TESTS -->
+        <div class="editor-panel">
+            <div class="editor-header">
+                <span>📝 main.py</span>
+                <span id="editorStatus">Python 3</span>
+            </div>
+            <div class="editor-container" id="editorContainer"></div>
+            
+            <div class="output-panel">
+                <div class="output-header">
+                    <span>🖥️ Salida</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="output-clear" onclick="clearOutput()">Limpiar</button>
+                        <button class="next-lesson-btn" id="nextLessonBtn" onclick="goToNextLesson()" disabled>Siguiente lección →</button>
+                    </div>
+                </div>
+                <div class="output-container" id="outputContainer">
+                    <div class="output-welcome">🐼 <span>Pandas Playground</span> - Salida</div>
+                    <div class="output-welcome" style="color: #666;">Usa print() para ver resultados aquí</div>
+                </div>
+            </div>
+            
+            <div class="test-panel">
+                <div class="test-header">
+                    <span>🧪 Resultados de Tests</span>
+                    <span id="testCount">0/0 tests pasados</span>
+                </div>
+                <div class="test-results" id="testResults">
+                    <div class="test-info">Haz clic en "Ejecutar Test (Ctrl+Enter)" o presiona Ctrl+Enter para validar tu código.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PYODIDE -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+    
+
+    
+    <!-- MONACO EDITOR -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+    <script>
+        const lessons = [
+            {
+                id: 1,
+                title: "Chunking - Lectura por bloques",
+                instructions: `
+                    <p>Cuando un CSV es muy grande para cargarse completo en memoria, puedes leerlo por bloques usando <code>chunksize</code>.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code>import pandas as pd
+
+for chunk in pd.read_csv('big.csv', chunksize=1000):
+    procesar(chunk)  # Cada chunk es un DataFrame pequeño</code></pre>
+                    
+                    <p><code>pd.read_csv()</code> con <code>chunksize</code> retorna un iterador que yieldea DataFrames de N filas cada uno.</p>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Lee el archivo <code>ventas.csv</code> en bloques de <strong>2 filas</strong> y concaténalos en un DataFrame completo llamado <code>df_completo</code>.</p>
+                    
+                    <p>El archivo <code>ventas.csv</code> contiene:</p>
+                    <pre><code>producto,precio,cantidad
+Laptop,1200,5
+Mouse,25,50
+Teclado,80,30
+Monitor,350,15</code></pre>
+`,
+                seedCode: `import pandas as pd\nimport io\n\n# Simulamos un archivo CSV\ncsv_data = """producto,precio,cantidad\nLaptop,1200,5\nMouse,25,50\nTeclado,80,30\nMonitor,350,15"""\n\n# Lee el CSV en bloques de 2 filas usando chunksize\ndfs = []\nfor chunk in pd.read_csv(io.StringIO(csv_data), chunksize=2):\n    # Completa aqui: agrega cada chunk a la lista dfs\n    pass\n\n# Completa aqui: concatena todos los chunks en df_completo\nprint(df_completo)`,
+                solution: `import pandas as pd\nimport io\n\ncsv_data = """producto,precio,cantidad\nLaptop,1200,5\nMouse,25,50\nTeclado,80,30\nMonitor,350,15"""\n\ndfs = []\nfor chunk in pd.read_csv(io.StringIO(csv_data), chunksize=2):\n    dfs.append(chunk)\n\ndf_completo = pd.concat(dfs, ignore_index=True)\nprint(df_completo)`,
+                tests: [
+                    {
+                        name: "Variable df_completo existe",
+                        code: `dfs = []\nfor chunk in pd.read_csv(io.StringIO(csv_data), chunksize=2):\n    dfs.append(chunk)\ndf_completo = pd.concat(dfs, ignore_index=True)`,
+                        validation: `'df_completo' in dir()`,
+                        error: "Debes crear una variable llamada 'df_completo'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `dfs = []\nfor chunk in pd.read_csv(io.StringIO(csv_data), chunksize=2):\n    dfs.append(chunk)\ndf_completo = pd.concat(dfs, ignore_index=True)`,
+                        validation: `isinstance(df_completo, pd.DataFrame)`,
+                        error: "df_completo debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene 4 filas",
+                        code: `dfs = []\nfor chunk in pd.read_csv(io.StringIO(csv_data), chunksize=2):\n    dfs.append(chunk)\ndf_completo = pd.concat(dfs, ignore_index=True)`,
+                        validation: `len(df_completo) == 4`,
+                        error: "df_completo debe tener 4 filas"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Efficient dtypes",
+                instructions: `
+                    <p>Las columnas con pocos valores únicos (como categorías, géneros, países) gastan mucha memoria como strings. El dtype <code>category</code> optimiza esto.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code># Antes: object (string), usa mucha memoria
+df['color'] = df['color'].astype('category')
+# Ahora: category, usa muy poca memoria</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Convierte la columna <code>categoria</code> del DataFrame a dtype <code>category</code>. Guarda el resultado como <code>df_optimizado</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'USB'],\n    'categoria': ['Electronica', 'Accesorios', 'Accesorios', 'Electronica', 'Accesorios'],\n    'precio': [1200, 25, 80, 350, 10]\n})\n\n# Convierte la columna 'categoria' a category dtype\n# Guarda en df_optimizado (puede ser el mismo df modificado)\nprint(df_optimizado.dtypes)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'USB'],\n    'categoria': ['Electronica', 'Accesorios', 'Accesorios', 'Electronica', 'Accesorios'],\n    'precio': [1200, 25, 80, 350, 10]\n})\n\ndf_optimizado = df.copy()\ndf_optimizado['categoria'] = df_optimizado['categoria'].astype('category')\nprint(df_optimizado.dtypes)`,
+                tests: [
+                    {
+                        name: "Variable df_optimizado existe",
+                        code: `df_optimizado = df.copy()\ndf_optimizado['categoria'] = df_optimizado['categoria'].astype('category')`,
+                        validation: `'df_optimizado' in dir()`,
+                        error: "Debes crear una variable llamada 'df_optimizado'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `df_optimizado = df.copy()\ndf_optimizado['categoria'] = df_optimizado['categoria'].astype('category')`,
+                        validation: `isinstance(df_optimizado, pd.DataFrame)`,
+                        error: "df_optimizado debe ser un DataFrame"
+                    },
+                    {
+                        name: "Columna categoria es category dtype",
+                        code: `df_optimizado = df.copy()\ndf_optimizado['categoria'] = df_optimizado['categoria'].astype('category')`,
+                        validation: `df_optimizado['categoria'].dtype.name == 'category'`,
+                        error: "La columna 'categoria' debe ser de tipo category"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "UDFs con apply",
+                instructions: `
+                    <p>El método <code>.apply()</code> aplica una función personalizada a cada fila o columna de un DataFrame.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code>df['doble'] = df['numero'].apply(lambda x: x * 2)</code></pre>
+                    
+                    <p>También puedes definir funciones completas:</p>
+                    <pre><code>def mi_funcion(valor):
+    if valor > 100: return 'Alto'
+    return 'Bajo'
+
+df['clase'] = df['monto'].apply(mi_funcion)</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Crea una función <code>clasificar(precio)</code> que retorne:</p>
+                    <ul>
+                        <li><code>'Barato'</code> si precio &lt; 50</li>
+                        <li><code>'Medio'</code> si precio &lt; 200</li>
+                        <li><code>'Caro'</code> en caso contrario</li>
+                    </ul>
+                    <p>Aplica la función a la columna <code>precio</code> y guarda el resultado en <code>df_clasificado</code> con una columna llamada <code>clasificacion</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Mouse', 'Teclado', 'Monitor', 'Laptop'],\n    'precio': [25, 80, 350, 1200]\n})\n\n# Define la funcion clasificar\n# def clasificar(precio):\n#     ...\n\n# Aplica la funcion a la columna 'precio'\n# df_clasificado = ...\nprint(df_clasificado)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Mouse', 'Teclado', 'Monitor', 'Laptop'],\n    'precio': [25, 80, 350, 1200]\n})\n\ndef clasificar(precio):\n    if precio < 50:\n        return 'Barato'\n    elif precio < 200:\n        return 'Medio'\n    else:\n        return 'Caro'\n\ndf_clasificado = df.copy()\ndf_clasificado['clasificacion'] = df_clasificado['precio'].apply(clasificar)\nprint(df_clasificado)`,
+                tests: [
+                    {
+                        name: "Variable df_clasificado existe",
+                        code: `def clasificar(precio):\n    if precio < 50: return 'Barato'\n    elif precio < 200: return 'Medio'\n    return 'Caro'\ndf_clasificado = df.copy()\ndf_clasificado['clasificacion'] = df_clasificado['precio'].apply(clasificar)`,
+                        validation: `'df_clasificado' in dir()`,
+                        error: "Debes crear una variable llamada 'df_clasificado'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `def clasificar(precio):\n    if precio < 50: return 'Barato'\n    elif precio < 200: return 'Medio'\n    return 'Caro'\ndf_clasificado = df.copy()\ndf_clasificado['clasificacion'] = df_clasificado['precio'].apply(clasificar)`,
+                        validation: `isinstance(df_clasificado, pd.DataFrame)`,
+                        error: "df_clasificado debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene columna clasificacion",
+                        code: `def clasificar(precio):\n    if precio < 50: return 'Barato'\n    elif precio < 200: return 'Medio'\n    return 'Caro'\ndf_clasificado = df.copy()\ndf_clasificado['clasificacion'] = df_clasificado['precio'].apply(clasificar)`,
+                        validation: `'clasificacion' in df_clasificado.columns`,
+                        error: "Debe existir la columna 'clasificacion'"
+                    },
+                    {
+                        name: "Clasificaciones correctas",
+                        code: `def clasificar(precio):\n    if precio < 50: return 'Barato'\n    elif precio < 200: return 'Medio'\n    return 'Caro'\ndf_clasificado = df.copy()\ndf_clasificado['clasificacion'] = df_clasificado['precio'].apply(clasificar)`,
+                        validation: `list(df_clasificado['clasificacion']) == ['Barato', 'Medio', 'Caro', 'Caro']`,
+                        error: "Las clasificaciones deben ser: Barato, Medio, Caro, Caro"
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "nlargest / nsmallest",
+                instructions: `
+                    <p>Los métodos <code>.nlargest()</code> y <code>.nsmallest()</code> obtienen los N valores más grandes o pequeños de una columna de forma eficiente.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code># Los 3 más caros
+top3 = df.nlargest(3, 'precio')
+
+# Los 2 más baratos
+bottom2 = df.nsmallest(2, 'precio')</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Obtén los <strong>2 productos más caros</strong> del DataFrame. Guarda el resultado en <code>top_productos</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Mouse', 'Teclado', 'Monitor', 'Laptop', 'USB'],\n    'precio': [25, 80, 350, 1200, 10]\n})\n\n# Obtén los 2 productos con mayor precio\n# top_productos = ...\nprint(top_productos)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Mouse', 'Teclado', 'Monitor', 'Laptop', 'USB'],\n    'precio': [25, 80, 350, 1200, 10]\n})\n\ntop_productos = df.nlargest(2, 'precio')\nprint(top_productos)`,
+                tests: [
+                    {
+                        name: "Variable top_productos existe",
+                        code: `top_productos = df.nlargest(2, 'precio')`,
+                        validation: `'top_productos' in dir()`,
+                        error: "Debes crear una variable llamada 'top_productos'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `top_productos = df.nlargest(2, 'precio')`,
+                        validation: `isinstance(top_productos, pd.DataFrame)`,
+                        error: "top_productos debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene 2 filas",
+                        code: `top_productos = df.nlargest(2, 'precio')`,
+                        validation: `len(top_productos) == 2`,
+                        error: "Debe tener exactamente 2 filas"
+                    },
+                    {
+                        name: "El más caro es Laptop",
+                        code: `top_productos = df.nlargest(2, 'precio')`,
+                        validation: `top_productos.iloc[0]['producto'] == 'Laptop'`,
+                        error: "El producto más caro debe ser Laptop"
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Pivot tables",
+                instructions: `
+                    <p>Las tablas pivote reorganizan datos de formato largo a ancho, aplicando funciones de agregación como suma, promedio, etc.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code>tabla = pd.pivot_table(
+    df,
+    values='ventas',
+    index='categoria',
+    aggfunc='sum'
+)</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Crea una tabla pivote usando <code>categoria</code> como índice y la <strong>suma</strong> de <code>precio</code> como valores. Guarda en <code>tabla_pivote</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'USB'],\n    'categoria': ['Electronica', 'Accesorios', 'Accesorios', 'Electronica', 'Accesorios'],\n    'precio': [1200, 25, 80, 350, 10]\n})\n\n# Crea una pivot table con suma de precio por categoria\n# tabla_pivote = ...\nprint(tabla_pivote)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'USB'],\n    'categoria': ['Electronica', 'Accesorios', 'Accesorios', 'Electronica', 'Accesorios'],\n    'precio': [1200, 25, 80, 350, 10]\n})\n\ntabla_pivote = pd.pivot_table(df, values='precio', index='categoria', aggfunc='sum')\nprint(tabla_pivote)`,
+                tests: [
+                    {
+                        name: "Variable tabla_pivote existe",
+                        code: `tabla_pivote = pd.pivot_table(df, values='precio', index='categoria', aggfunc='sum')`,
+                        validation: `'tabla_pivote' in dir()`,
+                        error: "Debes crear una variable llamada 'tabla_pivote'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `tabla_pivote = pd.pivot_table(df, values='precio', index='categoria', aggfunc='sum')`,
+                        validation: `isinstance(tabla_pivote, pd.DataFrame)`,
+                        error: "tabla_pivote debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene 2 categorías",
+                        code: `tabla_pivote = pd.pivot_table(df, values='precio', index='categoria', aggfunc='sum')`,
+                        validation: `len(tabla_pivote) == 2`,
+                        error: "Debe haber 2 categorías"
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Explode",
+                instructions: `
+                    <p><code>.explode()</code> transforma una columna que contiene listas en filas separadas, expandiendo el DataFrame.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code>df = pd.DataFrame({
+    'productos': [['Mouse', 'Teclado'], ['Monitor']]
+})
+df_exploded = df.explode('productos')
+# Resultado: 2 filas, una con Mouse y otra con Teclado en la primera fila original</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>El DataFrame tiene una columna <code>productos</code> con listas. Aplica <code>.explode()</code> a esa columna. Guarda en <code>df_exploded</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'tienda': ['A', 'B', 'C'],\n    'productos': [['Laptop', 'Mouse'], ['Teclado'], ['Monitor', 'USB', 'Cable']]\n})\n\n# Aplica explode a la columna 'productos'\n# df_exploded = ...\nprint(df_exploded)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'tienda': ['A', 'B', 'C'],\n    'productos': [['Laptop', 'Mouse'], ['Teclado'], ['Monitor', 'USB', 'Cable']]\n})\n\ndf_exploded = df.explode('productos')\nprint(df_exploded)`,
+                tests: [
+                    {
+                        name: "Variable df_exploded existe",
+                        code: `df_exploded = df.explode('productos')`,
+                        validation: `'df_exploded' in dir()`,
+                        error: "Debes crear una variable llamada 'df_exploded'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `df_exploded = df.explode('productos')`,
+                        validation: `isinstance(df_exploded, pd.DataFrame)`,
+                        error: "df_exploded debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene más filas que el original",
+                        code: `df_exploded = df.explode('productos')`,
+                        validation: `len(df_exploded) > len(df)`,
+                        error: "df_exploded debe tener más filas que df"
+                    },
+                    {
+                        name: "Tiene 6 filas",
+                        code: `df_exploded = df.explode('productos')`,
+                        validation: `len(df_exploded) == 6`,
+                        error: "Debe tener 6 filas (2 + 1 + 3)"
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Window functions",
+                instructions: `
+                    <p>Las funciones de ventana permiten calcular estadísticas móviles sobre una ventana deslizante de datos.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code># Media móvil de 3 períodos
+df['media_movil'] = df['ventas'].rolling(3).mean()
+
+# Suma acumulada
+df['acumulado'] = df['ventas'].expanding().sum()</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Calcula la <strong>media móvil de 3 días</strong> de la columna <code>ventas</code> y guárdala como <code>media_movil</code>. El resultado completo guarda en <code>df_ventanas</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'dia': [1, 2, 3, 4, 5],\n    'ventas': [100, 150, 200, 180, 220]\n})\n\n# Calcula la media movil de 3 periodos de 'ventas'\n# Guarda como columna 'media_movil' en df_ventanas\nprint(df_ventanas)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'dia': [1, 2, 3, 4, 5],\n    'ventas': [100, 150, 200, 180, 220]\n})\n\ndf_ventanas = df.copy()\ndf_ventanas['media_movil'] = df_ventanas['ventas'].rolling(3).mean()\nprint(df_ventanas)`,
+                tests: [
+                    {
+                        name: "Variable df_ventanas existe",
+                        code: `df_ventanas = df.copy()\ndf_ventanas['media_movil'] = df_ventanas['ventas'].rolling(3).mean()`,
+                        validation: `'df_ventanas' in dir()`,
+                        error: "Debes crear una variable llamada 'df_ventanas'"
+                    },
+                    {
+                        name: "Tiene columna media_movil",
+                        code: `df_ventanas = df.copy()\ndf_ventanas['media_movil'] = df_ventanas['ventas'].rolling(3).mean()`,
+                        validation: `'media_movil' in df_ventanas.columns`,
+                        error: "Debe existir la columna 'media_movil'"
+                    },
+                    {
+                        name: "Primer valor NaN",
+                        code: `df_ventanas = df.copy()\ndf_ventanas['media_movil'] = df_ventanas['ventas'].rolling(3).mean()`,
+                        validation: `pd.isna(df_ventanas['media_movil'].iloc[0])`,
+                        error: "El primer valor de media_movil debe ser NaN"
+                    },
+                    {
+                        name: "Tercer valor es 150.0",
+                        code: `df_ventanas = df.copy()\ndf_ventanas['media_movil'] = df_ventanas['ventas'].rolling(3).mean()`,
+                        validation: `abs(df_ventanas['media_movil'].iloc[2] - 150.0) < 0.01`,
+                        error: "El tercer valor de media_movil debe ser 150.0"
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "Cross-tabulation",
+                instructions: `
+                    <p><code>pd.crosstab()</code> crea tablas de frecuencia cruzada entre dos columnas categóricas.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code>tabla = pd.crosstab(df['genero'], df['ciudad'])
+# Cuenta cuántas veces aparece cada combinación</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Crea una tabla cruzada de <code>categoria</code> vs <code>ciudad</code>. Guarda en <code>tabla_cruz</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'USB', 'Cable'],\n    'categoria': ['Electronica', 'Accesorios', 'Accesorios', 'Electronica', 'Accesorios', 'Accesorios'],\n    'ciudad': ['Lima', 'Lima', 'Cusco', 'Cusco', 'Lima', 'Arequipa']\n})\n\n# Crea una crosstab de categoria vs ciudad\n# tabla_cruz = ...\nprint(tabla_cruz)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'USB', 'Cable'],\n    'categoria': ['Electronica', 'Accesorios', 'Accesorios', 'Electronica', 'Accesorios', 'Accesorios'],\n    'ciudad': ['Lima', 'Lima', 'Cusco', 'Cusco', 'Lima', 'Arequipa']\n})\n\ntabla_cruz = pd.crosstab(df['categoria'], df['ciudad'])\nprint(tabla_cruz)`,
+                tests: [
+                    {
+                        name: "Variable tabla_cruz existe",
+                        code: `tabla_cruz = pd.crosstab(df['categoria'], df['ciudad'])`,
+                        validation: `'tabla_cruz' in dir()`,
+                        error: "Debes crear una variable llamada 'tabla_cruz'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `tabla_cruz = pd.crosstab(df['categoria'], df['ciudad'])`,
+                        validation: `isinstance(tabla_cruz, pd.DataFrame)`,
+                        error: "tabla_cruz debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene 2 categorías",
+                        code: `tabla_cruz = pd.crosstab(df['categoria'], df['ciudad'])`,
+                        validation: `len(tabla_cruz) == 2`,
+                        error: "Debe haber 2 filas (categorías)"
+                    },
+                    {
+                        name: "Tiene 3 ciudades",
+                        code: `tabla_cruz = pd.crosstab(df['categoria'], df['ciudad'])`,
+                        validation: `len(tabla_cruz.columns) == 3`,
+                        error: "Debe haber 3 columnas (ciudades)"
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "DataFrame Styler",
+                instructions: `
+                    <p>Puedes aplicar estilos visuales a DataFrames para resaltar valores, crear gradientes de color, etc.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code># Degradado de color en la columna precio
+df.style.background_gradient(subset=['precio'], cmap='YlOrRd')
+
+# Resaltar valores máximos
+df.style.highlight_max(color='lightgreen')</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Crea un DataFrame estilizado con degradado de color en la columna <code>precio</code>. Guarda en <code>df_estilizado</code>.</p>
+                    
+                    <p>Nota: <code>df_estilizado</code> debe ser un objeto <code>Styler</code>, no un DataFrame normal.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor'],\n    'precio': [1200, 25, 80, 350]\n})\n\n# Crea un styler con background_gradient en la columna precio\n# df_estilizado = ...\n# print(type(df_estilizado))`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor'],\n    'precio': [1200, 25, 80, 350]\n})\n\ndf_estilizado = df.style.background_gradient(subset=['precio'])\nprint(type(df_estilizado))`,
+                tests: [
+                    {
+                        name: "Variable df_estilizado existe",
+                        code: `df_estilizado = df.style.background_gradient(subset=['precio'])`,
+                        validation: `'df_estilizado' in dir()`,
+                        error: "Debes crear una variable llamada 'df_estilizado'"
+                    },
+                    {
+                        name: "Es un Styler",
+                        code: `df_estilizado = df.style.background_gradient(subset=['precio'])`,
+                        validation: `type(df_estilizado).__name__ == 'Styler'`,
+                        error: "df_estilizado debe ser un objeto Styler"
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "Query method",
+                instructions: `
+                    <p>El método <code>.query()</code> permite filtrar filas usando una expresión de texto, similar a SQL pero dentro de pandas.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code># Filtrar por precio mayor a 100
+caros = df.query('precio > 100')
+
+# Múltiples condiciones
+resultado = df.query('precio > 50 and cantidad > 10')</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Filtra los productos donde <code>precio &gt; 50</code> <strong>AND</strong> <code>cantidad &gt; 10</code>. Guarda en <code>df_filtrado</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'USB'],\n    'precio': [1200, 25, 80, 350, 10],\n    'cantidad': [5, 50, 30, 15, 100]\n})\n\n# Filtra con query donde precio > 50 y cantidad > 10\n# df_filtrado = ...\nprint(df_filtrado)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado', 'Monitor', 'USB'],\n    'precio': [1200, 25, 80, 350, 10],\n    'cantidad': [5, 50, 30, 15, 100]\n})\n\ndf_filtrado = df.query('precio > 50 and cantidad > 10')\nprint(df_filtrado)`,
+                tests: [
+                    {
+                        name: "Variable df_filtrado existe",
+                        code: `df_filtrado = df.query('precio > 50 and cantidad > 10')`,
+                        validation: `'df_filtrado' in dir()`,
+                        error: "Debes crear una variable llamada 'df_filtrado'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `df_filtrado = df.query('precio > 50 and cantidad > 10')`,
+                        validation: `isinstance(df_filtrado, pd.DataFrame)`,
+                        error: "df_filtrado debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene 2 filas",
+                        code: `df_filtrado = df.query('precio > 50 and cantidad > 10')`,
+                        validation: `len(df_filtrado) == 2`,
+                        error: "Debe haber 2 productos (Teclado y Monitor)"
+                    },
+                    {
+                        name: "Todos cumplen precio > 50",
+                        code: `df_filtrado = df.query('precio > 50 and cantidad > 10')`,
+                        validation: `(df_filtrado['precio'] > 50).all()`,
+                        error: "Todos los precios deben ser mayores a 50"
+                    }
+                ]
+            },
+            {
+                id: 11,
+                title: "Eval method",
+                instructions: `
+                    <p><code>.eval()</code> evalúa expresiones matemáticas y de cadena sobre columnas de forma rápida y eficiente.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code># Crear una nueva columna con una expresión
+df.eval('total = cantidad * precio', inplace=True)
+
+# Expresiones más complejas
+df.eval('margen = (precio - costo) / precio', inplace=True)</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Usa <code>.eval()</code> para crear la columna <code>total</code> igual a <code>cantidad * precio</code>. Guarda el resultado en <code>df_eval</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado'],\n    'precio': [1200, 25, 80],\n    'cantidad': [5, 50, 30]\n})\n\n# Usa eval para crear la columna 'total' = cantidad * precio\n# df_eval = ...\nprint(df_eval)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado'],\n    'precio': [1200, 25, 80],\n    'cantidad': [5, 50, 30]\n})\n\ndf_eval = df.eval('total = cantidad * precio')\nprint(df_eval)`,
+                tests: [
+                    {
+                        name: "Variable df_eval existe",
+                        code: `df_eval = df.eval('total = cantidad * precio')`,
+                        validation: `'df_eval' in dir()`,
+                        error: "Debes crear una variable llamada 'df_eval'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `df_eval = df.eval('total = cantidad * precio')`,
+                        validation: `isinstance(df_eval, pd.DataFrame)`,
+                        error: "df_eval debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene columna total",
+                        code: `df_eval = df.eval('total = cantidad * precio')`,
+                        validation: `'total' in df_eval.columns`,
+                        error: "Debe existir la columna 'total'"
+                    },
+                    {
+                        name: "Valores correctos",
+                        code: `df_eval = df.eval('total = cantidad * precio')`,
+                        validation: `list(df_eval['total']) == [6000, 1250, 2400]`,
+                        error: "Los totales deben ser [6000, 1250, 2400]"
+                    }
+                ]
+            },
+            {
+                id: 12,
+                title: "Assign method",
+                instructions: `
+                    <p>El método <code>.assign()</code> crea nuevas columnas de forma encadenada sin modificar el DataFrame original.</p>
+                    
+                    <h3>Ejemplo en Python</h3>
+                    <pre><code>df_result = df.assign(
+    doble = df['precio'] * 2,
+    triple = df['precio'] * 3
+)</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Usa <code>.assign()</code> para crear:</p>
+                    <ul>
+                        <li><code>impuesto</code> = precio * 0.21</li>
+                        <li><code>total_con_impuesto</code> = precio + impuesto</li>
+                    </ul>
+                    <p>Guarda el resultado en <code>df_asignado</code>.</p>
+`,
+                seedCode: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado'],\n    'precio': [1200, 25, 80]\n})\n\n# Usa assign para crear 'impuesto' y 'total_con_impuesto'\n# df_asignado = ...\nprint(df_asignado)`,
+                solution: `import pandas as pd\n\ndf = pd.DataFrame({\n    'producto': ['Laptop', 'Mouse', 'Teclado'],\n    'precio': [1200, 25, 80]\n})\n\ndf_asignado = df.assign(\n    impuesto = df['precio'] * 0.21,\n    total_con_impuesto = df['precio'] * 1.21\n)\nprint(df_asignado)`,
+                tests: [
+                    {
+                        name: "Variable df_asignado existe",
+                        code: `df_asignado = df.assign(impuesto=df['precio']*0.21, total_con_impuesto=df['precio']*1.21)`,
+                        validation: `'df_asignado' in dir()`,
+                        error: "Debes crear una variable llamada 'df_asignado'"
+                    },
+                    {
+                        name: "Tiene columna impuesto",
+                        code: `df_asignado = df.assign(impuesto=df['precio']*0.21, total_con_impuesto=df['precio']*1.21)`,
+                        validation: `'impuesto' in df_asignado.columns`,
+                        error: "Debe existir la columna 'impuesto'"
+                    },
+                    {
+                        name: "Tiene columna total_con_impuesto",
+                        code: `df_asignado = df.assign(impuesto=df['precio']*0.21, total_con_impuesto=df['precio']*1.21)`,
+                        validation: `'total_con_impuesto' in df_asignado.columns`,
+                        error: "Debe existir la columna 'total_con_impuesto'"
+                    },
+                    {
+                        name: "Impuestos correctos",
+                        code: `df_asignado = df.assign(impuesto=df['precio']*0.21, total_con_impuesto=df['precio']*1.21)`,
+                        validation: `abs(df_asignado['impuesto'].iloc[0] - 252.0) < 0.01`,
+                        error: "El impuesto del Laptop debe ser 252.0"
+                    }
+                ]
+            },
+            {
+                id: 13,
+                title: "Proyecto Final",
+                instructions: `
+                    <p>En este proyecto final combinarás múltiples técnicas avanzadas de pandas.</p>
+                    
+                    <h3>Ejemplo de técnicas a combinar</h3>
+                    <pre><code># 1. Leer datos
+df = pd.read_csv('ventas.csv')
+
+# 2. Filtrar
+filtrado = df.query('precio > 50')
+
+# 3. Agregar columna con eval
+filtrado = filtrado.eval('impuesto = precio * 0.21')
+
+# 4. Agrupar y sumar
+agrupado = filtrado.groupby('categoria').sum()
+
+# 5. Obtener top N
+top = agrupado.nlargest(2, 'precio')</code></pre>
+                    
+                    <h3>Objetivo</h3>
+                    <p>Realiza los siguientes leccións:</p>
+                    <ol>
+                        <li>Lee el CSV (ya está simulizado en el código)</li>
+                        <li>Filtra donde <code>precio &gt; 50</code></li>
+                        <li>Agrega columna <code>impuesto</code> = precio * 0.21</li>
+                        <li>Agrupa por <code>categoria</code> y suma</li>
+                        <li>Obtén las <strong>2 categorías con mayor suma de precio</strong></li>
+                    </ol>
+                    <p>Guarda el resultado final en <code>resultado</code>.</p>
+`,
+                seedCode: `import pandas as pd\nimport io\n\ncsv_data = """producto,precio,categoria\ncamisa,40,Ropa\npantalon,80,Ropa\nlaptop,1200,Tech\nmouse,25,Tech\nauriculares,150,Tech\nzapatos,120,Calzado\nbolsa,60,Calzado"""\n\ndf = pd.read_csv(io.StringIO(csv_data))\n\n# Lección 1: Filtra productos con precio > 50\n# Lección 2: Agrega columna 'impuesto' = precio * 0.21\n# Lección 3: Agrupa por 'categoria' y suma\n# Lección 4: Obtén las 2 categorías con mayor suma de precio\n# resultado = ...\nprint(resultado)`,
+                solution: `import pandas as pd\nimport io\n\ncsv_data = """producto,precio,categoria\ncamisa,40,Ropa\npantalon,80,Ropa\nlaptop,1200,Tech\nmouse,25,Tech\nauriculares,150,Tech\nzapatos,120,Calzado\nbolsa,60,Calzado"""\n\ndf = pd.read_csv(io.StringIO(csv_data))\n\nfiltrado = df.query('precio > 50')\nfiltrado = filtrado.eval('impuesto = precio * 0.21')\nagrupado = filtrado.groupby('categoria').sum()\nresultado = agrupado.nlargest(2, 'precio')\nprint(resultado)`,
+                tests: [
+                    {
+                        name: "Variable resultado existe",
+                        code: `filtrado = df.query('precio > 50')\nfiltrado = filtrado.eval('impuesto = precio * 0.21')\nagrupado = filtrado.groupby('categoria').sum()\nresultado = agrupado.nlargest(2, 'precio')`,
+                        validation: `'resultado' in dir()`,
+                        error: "Debes crear una variable llamada 'resultado'"
+                    },
+                    {
+                        name: "Es un DataFrame",
+                        code: `filtrado = df.query('precio > 50')\nfiltrado = filtrado.eval('impuesto = precio * 0.21')\nagrupado = filtrado.groupby('categoria').sum()\nresultado = agrupado.nlargest(2, 'precio')`,
+                        validation: `isinstance(resultado, pd.DataFrame)`,
+                        error: "resultado debe ser un DataFrame"
+                    },
+                    {
+                        name: "Tiene 2 filas",
+                        code: `filtrado = df.query('precio > 50')\nfiltrado = filtrado.eval('impuesto = precio * 0.21')\nagrupado = filtrado.groupby('categoria').sum()\nresultado = agrupado.nlargest(2, 'precio')`,
+                        validation: `len(resultado) == 2`,
+                        error: "Debe haber 2 categorías"
+                    },
+                    {
+                        name: "Tech es la categoría con mayor precio",
+                        code: `filtrado = df.query('precio > 50')\nfiltrado = filtrado.eval('impuesto = precio * 0.21')\nagrupado = filtrado.groupby('categoria').sum()\nresultado = agrupado.nlargest(2, 'precio')`,
+                        validation: `resultado.index[0] == 'Tech'`,
+                        error: "La categoría con mayor precio debe ser Tech"
+                    }
+                ]
+            }
+        ];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentStep = parseInt(urlParams.get('lesson')) || 0;
+        if (currentStep < 0 || currentStep >= 13) currentStep = 0;
+        let pyodide = null;
+        let editor = null;
+        const completedSteps = JSON.parse(localStorage.getItem('pandasCompletedAvanzado')) || [];
+
+        async function initPyodide() {
+            const progressBar = document.getElementById('loadingProgressBar');
+            
+            updateLoadingStatus("Descargando Python (puede tardar 1-2 minutos)...");
+            progressBar.style.width = '10%';
+            
+            const progressInterval = setInterval(() => {
+                const current = parseFloat(progressBar.style.width);
+                if (current < 60) {
+                    progressBar.style.width = (current + 2) + '%';
+                }
+            }, 500);
+            
+            pyodide = await loadPyodide({
+                indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/"
+            });
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '70%';
+            updateLoadingStatus("Cargando pandas (pesado, pero solo la primera vez)...");
+            
+            const pandasProgress = setInterval(() => {
+                const current = parseFloat(progressBar.style.width);
+                if (current < 95) {
+                    progressBar.style.width = (current + 1) + '%';
+                }
+            }, 300);
+            
+            await pyodide.loadPackage(["pandas", "jinja2"]);
+            
+            // Configure pandas display options
+            pyodide.runPython(`import pandas as pd; pd.set_option('display.max_columns', None); pd.set_option('display.width', None); pd.set_option('display.max_colwidth', None)`);
+            
+            clearInterval(pandasProgress);
+            progressBar.style.width = '100%';
+            updateLoadingStatus("¡Listo!");
+            
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }, 500);
+        }
+
+        function updateLoadingStatus(text) {
+            document.getElementById('loadingStatus').textContent = text;
+        }
+
+        // ==================== OUTPUT PANEL ====================
+        let cellCounter = 0;
+
+        function clearOutput() {
+            cellCounter = 0;
+            const container = document.getElementById('outputContainer');
+            container.innerHTML = '<div class="output-welcome">🐼 <span>Pandas Playground</span> - Salida</div><div class="output-welcome" style="color: #666;">Usa print() para ver resultados aquí</div>';
+        }
+
+        function writeToOutput(text, isError = false) {
+            const container = document.getElementById('outputContainer');
+            const cell = document.createElement('div');
+            cell.className = 'output-cell';
+            const escaped = escapeHtml(text);
+            cell.innerHTML = `<div class="output-cell-prompt">Out [${++cellCounter}]:</div><div class="output-cell-text${isError ? ' error' : ''}">${escaped}</div>`;
+            container.appendChild(cell);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function writeRichOutput(html) {
+            const container = document.getElementById('outputContainer');
+            const cell = document.createElement('div');
+            cell.className = 'output-cell';
+            cell.innerHTML = `<div class="output-cell-prompt">Out [${++cellCounter}]:</div><div class="output-cell-html">${html}</div>`;
+            container.appendChild(cell);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function captureStdout(pyodide, code) {
+            let output = [];
+            
+            pyodide.setStdout({
+                batched: (text) => output.push(text)
+            });
+            pyodide.setStderr({
+                batched: (text) => output.push('\x1b[31m' + text + '\x1b[0m')
+            });
+            
+            try {
+                pyodide.runPython(`
+import pandas as _pd
+import sys as _sys
+                `);
+            } catch (e) {}
+
+            try {
+                pyodide.runPython(code);
+            } catch (error) {
+                output.push('\x1b[31m' + error.message + '\x1b[0m');
+            }
+
+            const textOutput = output.join('');
+
+            let richOutputs = [];
+            try {
+                richOutputs = pyodide.runPython(`
+_rich = []
+for _n, _o in list(globals().items()):
+    if _n.startswith('_'):
+        continue
+    if isinstance(_o, (_pd.DataFrame, _pd.Series)):
+        try:
+            _label = f'<div style="color:#61afef;font-size:0.8rem;margin-bottom:2px;font-weight:600;">{_n}</div>'
+            _rich.append(_label + _o.to_html(index=False, na_rep='NaN'))
+        except Exception:
+            pass
+_rich
+                `);
+            } catch (e) { console.error('Rich output error:', e); }
+
+            if (richOutputs && richOutputs.length > 0) {
+                richOutputs.forEach(html => {
+                    if (html && html.trim()) {
+                        writeRichOutput(html);
+                    }
+                });
+            } else if (textOutput.trim()) {
+                writeToOutput(textOutput);
+            }
+            
+            pyodide.setStdout({
+                batched: (text) => { writeToOutput(text); }
+            });
+            pyodide.setStderr({
+                batched: (text) => { writeToOutput(text, true); }
+            });
+            
+            return output.join('');
+        }
+
+        function initMonacoEditor() {
+            require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+            
+            require(['vs/editor/editor.main'], function () {
+                editor = monaco.editor.create(document.getElementById('editorContainer'), {
+                    value: '',
+                    language: 'python',
+                    theme: 'vs-dark',
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    lineNumbers: 'on',
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    tabSize: 4,
+                    wordWrap: 'on'
+                });
+                
+                loadLesson(currentStep);
+            });
+        }
+
+        function loadLesson(index) {
+            currentStep = index;
+            const lesson = lessons[index];
+            
+            document.getElementById('lessonTitle').textContent = `Lección ${lesson.id}: ${lesson.title}`;
+            document.getElementById('instructionsContent').innerHTML = lesson.instructions;
+            document.getElementById('stepInfo').textContent = `Lección ${lesson.id} de ${lessons.length}`;
+            
+            if (editor) {
+                editor.setValue(lesson.seedCode);
+            }
+            
+            document.getElementById('testResults').innerHTML = '<div class="test-info">Haz clic en "Ejecutar Test (Ctrl+Enter)" o presiona Ctrl+Enter para validar tu código.</div>';
+            document.getElementById('testCount').textContent = '0/0 tests pasados';
+            
+            clearOutput();
+            
+            // Disable next lesson button
+            document.getElementById('nextLessonBtn').disabled = true;
+            
+            updateStepNav();
+        }
+
+        function updateStepNav() {
+            const nav = document.getElementById('stepNav');
+            nav.innerHTML = '';
+            
+            lessons.forEach((lesson, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'step-dot';
+                if (index === currentStep) dot.classList.add('active');
+                if (completedSteps.includes(index)) dot.classList.add('completed');
+                dot.textContent = index + 1;
+                dot.onclick = () => loadLesson(index);
+                nav.appendChild(dot);
+            });
+        }
+
+        async function runTests() {
+            if (!pyodide || !editor) {
+                alert('El entorno aún se está cargando. Espera un momento.');
+                return;
+            }
+            
+            const lesson = lessons[currentStep];
+            const userCode = editor.getValue();
+            const resultsDiv = document.getElementById('testResults');
+            const testCount = document.getElementById('testCount');
+            
+            resultsDiv.innerHTML = '<div class="test-info">Ejecutando tests...</div>';
+            clearOutput();
+            
+            // Run code once and capture output for display
+            const initialOutput = captureStdout(pyodide, userCode);
+            
+            // Check for syntax errors
+            if (initialOutput && initialOutput.includes('\x1b[31m')) {
+                const errorMsg = initialOutput.replace(/\x1b\[31m/g, '').replace(/\x1b\[0m/g, '').trim();
+                resultsDiv.innerHTML = `<div class="test-fail">❌ ${errorMsg}</div>`;
+                testCount.textContent = '0/0 tests pasados';
+                showModal(errorMsg);
+                return;
+            }
+            
+            let passed = 0;
+            let total = lesson.tests.length;
+            let allPassed = true;
+            let results = [];
+            
+            for (let i = 0; i < lesson.tests.length; i++) {
+                const test = lesson.tests[i];
+                try {
+                    // Redirect stdout/stderr silently during tests
+                    let silentOutput = [];
+                    pyodide.setStdout({ batched: (text) => silentOutput.push(text) });
+                    pyodide.setStderr({ batched: (text) => silentOutput.push(text) });
+                    
+                    pyodide.runPython(userCode);
+                    const result = pyodide.runPython(test.validation);
+                    
+                    // Reset stdout to output
+                    pyodide.setStdout({ batched: (text) => { writeToOutput(text); } });
+                    pyodide.setStderr({ batched: (text) => { writeToOutput(text, true); } });
+                    
+                    if (result) {
+                        passed++;
+                        results.push(`<div class="test-pass">✅ Test ${i + 1}: ${test.name} - PASADO</div>`);
+                    } else {
+                        allPassed = false;
+                        results.push(`<div class="test-fail">❌ Test ${i + 1}: ${test.name} - FALLIDO</div>`);
+                        results.push(`<div class="test-fail" style="margin-left: 20px;">${test.error}</div>`);
+                    }
+                } catch (error) {
+                    allPassed = false;
+                    const errorMsg = error.message.split('\n').pop() || error.message;
+                    results.push(`<div class="test-fail">❌ Test ${i + 1}: ${test.name} - ERROR</div>`);
+                    results.push(`<div class="test-fail" style="margin-left: 20px;">${errorMsg}</div>`);
+                    writeToOutput(errorMsg, true);
+                    
+                    pyodide.setStdout({ batched: (text) => { writeToOutput(text); } });
+                    pyodide.setStderr({ batched: (text) => { writeToOutput(text, true); } });
+                    
+                    if (errorMsg.includes('SyntaxError') || errorMsg.includes('NameError') || errorMsg.includes('TypeError')) {
+                        showModal(errorMsg);
+                    }
+                }
+            }
+            
+            resultsDiv.innerHTML = results.join('');
+            testCount.textContent = `${passed}/${total} tests pasados`;
+            
+            if (allPassed) {
+                resultsDiv.innerHTML += `<div class="test-pass" style="margin-top: 15px; font-size: 1.1em;">🎉 ¡Todos los tests pasaron! Puedes avanzar al siguiente lección.</div>`;
+                
+                if (!completedSteps.includes(currentStep)) {
+                    completedSteps.push(currentStep);
+                    localStorage.setItem('pandasCompletedAvanzado', JSON.stringify(completedSteps));
+                    updateStepNav();
+                }
+                
+                // Enable next lesson button
+                if (currentStep < lessons.length - 1) {
+                    document.getElementById('nextLessonBtn').disabled = false;
+                }
+            }
+        }
+        
+        function goToNextLesson() {
+            if (currentStep < lessons.length - 1) {
+                document.getElementById('nextLessonBtn').disabled = true;
+                loadLesson(currentStep + 1);
+            }
+        }
+
+        function showModal(errorMsg) {
+            const modal = document.getElementById('errorModal');
+            const details = document.getElementById('modalDetails');
+            details.textContent = errorMsg;
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('errorModal').classList.remove('active');
+        }
+        
+        document.getElementById('errorModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        function showSolution() {
+            const lesson = lessons[currentStep];
+            if (lesson.solution && editor) {
+                if (confirm('¿Ver la solución? Se reemplazará tu código actual.')) {
+                    editor.setValue(lesson.solution);
+                }
+            }
+        }
+
+        function openGuide() {
+            document.getElementById('guideModal').classList.add('active');
+        }
+        
+        function closeGuide() {
+            document.getElementById('guideModal').classList.remove('active');
+        }
+        
+        document.getElementById('guideModal').addEventListener('click', function(e) {
+            if (e.target === this) closeGuide();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeGuide();
+            }
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                runTests();
+            }
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                showSolution();
+            }
+        });
+
+        function resetCode() {
+            if (editor && confirm('¿Estás seguro de que quieres reiniciar el código?')) {
+                editor.setValue(lessons[currentStep].seedCode);
+                document.getElementById('testResults').innerHTML = '<div class="test-info">Código reiniciado.</div>';
+                clearOutput();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initMonacoEditor();
+            initPyodide();
+        });
+
+    </script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js')}</script>
+</body>
+</html>
