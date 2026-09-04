@@ -836,7 +836,7 @@
 </head>
 <body>
     <!-- LOADING OVERLAY -->
-    <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-overlay" id="loadingOverlay" style="display:none;">
         <div class="loading-spinner"></div>
         <div class="loading-text">Cargando entorno de Python...</div>
         <div class="loading-subtext" id="loadingStatus">Inicializando Pyodide</div>
@@ -1003,6 +1003,7 @@ df.style.highlight_max()</code></pre>
             <div class="output-panel">
                 <div class="output-header">
                     <span>🖥️ Salida</span>
+                    <span id="pyodideStatus" style="font-size: 0.75rem; color: #999;">⏳ Cargando entorno Python...</span>
                     <div style="display: flex; gap: 8px;">
                         <button class="output-clear" onclick="clearOutput()">Limpiar</button>
                         <button class="next-lesson-btn" id="nextLessonBtn" onclick="goToNextLesson()" disabled>Siguiente lección →</button>
@@ -1739,6 +1740,14 @@ top = agrupado.nlargest(2, 'precio')</code></pre>
             clearInterval(pandasProgress);
             progressBar.style.width = '100%';
             updateLoadingStatus("¡Listo!");
+            
+            document.getElementById('pyodideStatus').textContent = '✅ Entorno listo';
+            document.getElementById('pyodideStatus').style.color = '#00d4aa';
+            
+            setTimeout(() => {
+                document.getElementById('pyodideStatus').textContent = '';
+                document.getElementById('pyodideStatus').style.color = '#999';
+            }, 2000);
             
             setTimeout(() => {
                 document.getElementById('loadingOverlay').style.display = 'none';
