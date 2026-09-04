@@ -1,4 +1,7 @@
-const CACHE_NAME = 'pandas-playground-v1';
+const CACHE_NAME = 'pandas-playground-v2';
+const PYODIDE_CACHE = 'pyodide-v0.26.4';
+const MONACO_CACHE = 'monaco-v0.45.0';
+const PYTHON_PKG_CACHE = 'python-packages-v1';
 
 const URLS_TO_CACHE = [
   './',
@@ -9,12 +12,8 @@ const URLS_TO_CACHE = [
   './desafio.html',
   './lecciones_principiante.html',
   './lecciones_intermedio.html',
-  './lecciones_avanzado.html',
-  'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js',
-  'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js'
+  './lecciones_avanzado.html'
 ];
-
-const PYODIDE_CACHE = 'pyodide-v0.26.4';
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -28,7 +27,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(key => key !== CACHE_NAME && key !== PYODIDE_CACHE)
+        keys.filter(key => key !== CACHE_NAME && key !== PYODIDE_CACHE && key !== MONACO_CACHE && key !== PYTHON_PKG_CACHE)
             .map(key => caches.delete(key))
       )
     ).then(() => self.clients.claim())
@@ -53,10 +52,39 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  if (url.includes('monaco-editor')) {
+    event.respondWith(
+      caches.open(MONACO_CACHE).then(cache =>
+        cache.match(event.request).then(cached => {
+          if (cached) return cached;
+          return fetch(event.request).then(response => {
+            if (response.ok) cache.put(event.request, response.clone());
+            return response;
+          });
+        })
+      )
+    );
+    return;
+  }
+
+  if (url.includes('.whl') || url.includes('micropip') || url.includes('pypi.org') || url.includes('pandas') || url.includes('jinja2') || url.includes('numpy')) {
+    event.respondWith(
+      caches.open(PYTHON_PKG_CACHE).then(cache =>
+        cache.match(event.request).then(cached => {
+          if (cached) return cached;
+          return fetch(event.request).then(response => {
+            if (response.ok) cache.put(event.request, response.clone());
+            return response;
+          }).catch(() => cached);
+        })
+      )
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
+      return cached || fetch(event.request).then(response => {
         if (response.ok && event.request.method === 'GET') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));

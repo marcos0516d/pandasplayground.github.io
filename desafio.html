@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pandas Playground - Desafío</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -553,11 +553,159 @@
             transform: translateY(0);
         }
 
-        @media (max-width: 900px) {
-            .main-container { flex-direction: column; }
-            .instructions-panel { width: 100%; height: 40vh; min-width: auto; }
-            .editor-panel { height: 60vh; }
-            .step-dot { width: 24px; height: 24px; font-size: 0.7rem; }
+        /* MOBILE TAB LAYOUT */
+        
+        /* RESPONSIVE OVERRIDES FOR BOOTSTRAP */
+        @media (max-width: 991px) {
+            .instructions-panel {
+                max-height: 40vh;
+                min-width: unset;
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid var(--gris-medio);
+            }
+            .editor-panel {
+                min-height: 60vh;
+            }
+            .main-container {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            body {
+                overflow: auto;
+                height: auto;
+            }
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+            #mobileNav {
+                top: 65px;
+            }
+            .header-steps {
+                display: none !important;
+            }
+            .header-buttons .btn-text {
+                display: none;
+            }
+            .header-buttons .btn {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                transform: translateX(200vw);
+                transition: transform 0.4s ease;
+            }
+            .header-buttons .volver-btn {
+                transform: translateX(90px) !important;
+            }
+            body.output-active .header-buttons .volver-btn,
+            body.editor-active .header-buttons .volver-btn {
+                transform: translateX(0) !important;
+            }
+            body.output-active .header-buttons .btn,
+            body.editor-active .header-buttons .btn {
+                transform: translateX(0);
+            }
+            .instructions-panel {
+                max-height: none;
+                height: auto;
+                border-right: none;
+            }
+            .main-container {
+                height: auto;
+                overflow-y: auto;
+            }
+            .guide-link, .solution-btn {
+                display: none !important;
+            }
+            .d-md-none.position-fixed.bottom-0 {
+                bottom: 185px !important;
+                transition: transform 0.3s ease;
+            }
+            body.output-active .d-md-none.position-fixed.bottom-0 {
+                transform: translateX(calc(100% + 60px));
+            }
+            .pandas-btn {
+            }
+            body.output-active .pandas-btn,
+            body.editor-active .pandas-btn {
+                display: flex !important;
+                bottom: -50px !important;
+                right: 109px !important;
+                width: 205px !important;
+                height: 205px !important;
+                opacity: 0.5;
+            }
+            #mobileNav {
+                position: fixed;
+                top: 50px;
+                left: 0;
+                right: 0;
+                z-index: 999;
+            }
+            .main-container {
+                margin-top: 92px;
+            }
+            .editor-panel {
+                display: flex;
+                flex-direction: column;
+                height: 665px;
+                overflow: hidden;
+                position: relative;
+            }
+            .editor-container {
+                min-height: 400px;
+                height: 50vh;
+            }
+            .output-panel {
+                position: absolute;
+                bottom: 50%;
+                left: 0;
+                right: 0;
+                height: 50%;
+                transform: translateY(100%);
+                transition: transform 0.4s ease;
+                z-index: 10;
+            }
+            .test-panel {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 50%;
+                transform: translateY(100%);
+                transition: transform 0.4s ease;
+                z-index: 11;
+            }
+            .panel-visible .output-panel,
+            .panel-visible .test-panel {
+                transform: translateY(0);
+            }
+        }
+        
+        #mobileNav {
+            background: var(--azul);
+        }
+        #mobileNav .nav-link {
+            color: rgba(255,255,255,0.7);
+            border: none;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+        #mobileNav .nav-link.active {
+            color: var(--naranja);
+            background: rgba(255,255,255,0.05);
+            border-bottom: 2px solid var(--naranja);
         }
     </style>
 </head>
@@ -586,32 +734,45 @@
     <!-- HEADER -->
     <div class="header">
         <a href="index.html" class="header-logo" style="text-decoration:none;">🐼 Pandas Playground <span style="color: var(--naranja);">- Desafío</span></a>
-        <div class="header-steps" id="stepInfo">Desafío 1 de 3</div>
+        <div class="header-steps d-none d-sm-block" id="stepInfo">Desafío 1 de 3</div>
         <div class="header-buttons">
-            <a href="index.html" class="btn btn-secondary" style="text-decoration:none;">← Volver</a>
-            <button class="btn btn-secondary" onclick="resetCode()">🔄 Reiniciar</button>
-            <button class="btn btn-primary" onclick="runTests()">▶ Ejecutar Test (Ctrl+Enter)</button>
+            <a href="index.html" class="btn btn-secondary volver-btn" style="text-decoration:none;"><span class="d-inline d-sm-none">←</span><span class="btn-text">Volver</span></a>
+            <button class="btn btn-secondary" onclick="resetCode()">↻ <span class="btn-text d-none d-sm-inline">Reiniciar</span></button>
+            <button class="btn btn-primary" onclick="runTests()">▶ <span class="btn-text d-none d-sm-inline">Ejecutar Test</span></button>
         </div>
     </div>
+
+    <!-- MOBILE NAV TABS -->
+    <ul class="nav nav-tabs d-md-none" id="mobileNav">
+        <li class="nav-item">
+            <button class="nav-link active" onclick="switchTab('instructions')" type="button">📖 Instrucciones</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="switchTab('editor')" type="button">✏️ Editor</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="switchTab('output')" type="button">📊 Resultado</button>
+        </li>
+    </ul>
 
     <!-- MAIN CONTENT -->
     <div class="main-container">
         <!-- LEFT: INSTRUCTIONS -->
-        <div class="instructions-panel">
+        <div class="instructions-panel mobile-active" id="instructions">
             <div class="step-nav" id="stepNav"></div>
             <div class="instructions-header">
                 <h2 id="lessonTitle">Desafío 1: Limpieza de Datos</h2>
             </div>
             <div class="instructions-content" id="instructionsContent"></div>
             <div style="padding: 15px 20px; border-top: 1px solid var(--gris-medio);">
-                <button class="solution-btn" onclick="showSolution()">💡 Solución (Ctrl+S)</button>
+                <button class="solution-btn" onclick="showSolution()">🏳️ Solución (Ctrl+S)</button>
             </div>
         </div>
 
         <!-- RIGHT: EDITOR + TESTS -->
-        <div class="editor-panel">
+        <div class="editor-panel" id="editorPanel">
             <div class="editor-header">
-                <span>📝 main.py</span>
+                <span>&lt;&gt; main.py</span>
                 <span id="editorStatus">Python 3</span>
             </div>
             <div class="editor-container" id="editorContainer"></div>
@@ -621,8 +782,10 @@
                     <span>🖥️ Salida</span>
                     <div style="display: flex; gap: 8px;">
                         <button class="output-clear" onclick="clearOutput()">Limpiar</button>
-                        <button class="next-lesson-btn" id="nextLessonBtn" onclick="goToNextLesson()" disabled>Siguiente desafío →</button>
+                        <button class="next-lesson-btn" id="nextLessonBtn" onclick="goToNextLesson()" disabled>Siguiente lección →</button>
                     </div>
+                </div>                    </div>
+                </div>
                 </div>
                 <div class="output-container" id="outputContainer">
                     <div class="output-welcome">🐼 <span>Pandas Playground</span> - Salida</div>
@@ -642,11 +805,76 @@
         </div>
     </div>
 
+    <!-- MOBILE ACTION BUTTONS -->
+    <div class="d-md-none position-fixed bottom-0 end-0 p-3" style="z-index: 100;display:flex;flex-direction:column;gap:10px;">
+        <button class="btn rounded-circle" onclick="showSolution()" style="width:48px;height:48px;font-size:1.2rem;background:linear-gradient(135deg, #f093fb 0%, #f5576c 100%);color:white;border:none;display:flex;align-items:center;justify-content:center;">💡</button>
+    </div>
+    <button class="d-md-none position-fixed end-0 p-3 pandas-btn" onclick="window.open('https://pandas.pydata.org/', '_blank')" style="z-index: 100;width:205px;height:205px;border:none;background:transparent;display:none;align-items:center;justify-content:center;bottom:-50px;right:109px;">
+        <img src="png_pandas.png" alt="Pandas" style="width:205px;height:205px;">
+    </button>
+
     <!-- PYODIDE -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 
     <!-- MONACO EDITOR -->
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- MOBILE TAB SWITCHING -->
+    <script>
+        function switchTab(tab) {
+            var instructions = document.querySelector('.instructions-panel');
+            var editorPanel = document.querySelector('.editor-panel');
+            var editorContainer = document.querySelector('.editor-container');
+            var outputPanel = document.querySelector('.output-panel');
+            var testPanel = document.querySelector('.test-panel');
+            var tabs = document.querySelectorAll('#mobileNav .nav-link');
+            
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            document.body.classList.remove('output-active');
+            document.body.classList.remove('editor-active');
+            
+            if (tab === 'instructions') {
+                tabs[0].classList.add('active');
+                instructions.style.display = 'flex';
+                editorPanel.style.display = 'none';
+                editorPanel.classList.remove('panel-visible');
+            } else if (tab === 'editor') {
+                tabs[1].classList.add('active');
+                instructions.style.display = 'none';
+                editorPanel.style.display = 'flex';
+                editorContainer.style.display = 'block';
+                editorPanel.classList.remove('panel-visible');
+                document.body.classList.add('editor-active');
+                if (window.monacoEditor) window.monacoEditor.layout();
+            } else if (tab === 'output') {
+                tabs[2].classList.add('active');
+                instructions.style.display = 'none';
+                editorPanel.style.display = 'flex';
+                editorPanel.classList.add('panel-visible');
+                document.body.classList.add('output-active');
+                if (window.monacoEditor) window.monacoEditor.layout();
+            }
+        }
+
+        if (window.innerWidth < 768) {
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                document.querySelector('.instructions-panel').style.display = 'flex';
+                document.querySelector('.editor-panel').style.display = 'flex';
+                if (window.monacoEditor) window.monacoEditor.layout();
+            } else {
+                var activeTab = document.querySelector('#mobileNav .nav-link.active');
+                if (activeTab && activeTab.textContent.includes('Instrucciones')) {
+                    document.querySelector('.editor-panel').style.display = 'none';
+                } else {
+                    document.querySelector('.instructions-panel').style.display = 'none';
+                }
+            }
+        });
+    </script>
 
     <script>
         // ==================== STATE ====================
@@ -870,13 +1098,13 @@ id_pedido,producto_id,cantidad,cliente,fecha
         async function initPyodide() {
             const progressBar = document.getElementById('loadingProgressBar');
             
-            updateLoadingStatus("Descargando Python (puede tardar 1-2 minutos)...");
+            updateLoadingStatus("Descargando Python y pandas (~50MB, solo la primera vez)...");
             progressBar.style.width = '10%';
             
             const progressInterval = setInterval(() => {
                 const current = parseFloat(progressBar.style.width);
-                if (current < 60) {
-                    progressBar.style.width = (current + 2) + '%';
+                if (current < 90) {
+                    progressBar.style.width = (current + 1) + '%';
                 }
             }, 500);
             
@@ -885,8 +1113,8 @@ id_pedido,producto_id,cantidad,cliente,fecha
             });
             
             clearInterval(progressInterval);
-            progressBar.style.width = '70%';
-            updateLoadingStatus("Cargando pandas (pesado, pero solo la primera vez)...");
+            progressBar.style.width = '50%';
+            updateLoadingStatus("Cargando pandas...");
             
             const pandasProgress = setInterval(() => {
                 const current = parseFloat(progressBar.style.width);
@@ -1046,6 +1274,7 @@ _rich
                     tabSize: 4,
                     wordWrap: 'on'
                 });
+                window.monacoEditor = editor;
                 
                 loadLesson(currentStep);
             });
@@ -1068,6 +1297,11 @@ _rich
             document.getElementById('testCount').textContent = '0/0 tests pasados';
             
             clearOutput();
+            
+            if (window.innerWidth <= 600) {
+                document.querySelector('.output-panel').classList.remove('visible');
+                document.querySelector('.test-panel').classList.remove('visible');
+            }
             
             document.getElementById('nextLessonBtn').disabled = true;
             
@@ -1167,6 +1401,9 @@ _rich
             testCount.textContent = `${passed}/${total} tests pasados`;
             
             if (allPassed) {
+                if (window.innerWidth <= 600) {
+                    document.querySelector('.output-panel').classList.add('visible');
+                }
                 resultsDiv.innerHTML += `<div class="test-pass" style="margin-top: 15px; font-size: 1.1em;">🎉 ¡Todos los tests pasaron! Has completado este desafío.</div>`;
                 
                 if (!completedSteps.includes(currentStep)) {

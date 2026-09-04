@@ -25,6 +25,7 @@
             background: var(--gris-claro);
             color: var(--texto);
             min-height: 100vh;
+            padding-top: 50px;
         }
 
         .header {
@@ -35,6 +36,11 @@
             align-items: center;
             justify-content: space-between;
             height: 50px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
         
         .header-logo { font-size: 1.2rem; font-weight: bold; color: var(--verde); }
@@ -115,17 +121,89 @@
 
         .footer { background: var(--azul); color: rgba(255, 255, 255, 0.6); text-align: center; padding: 20px; font-size: 0.8rem; margin-top: 20px; }
 
+        /* RESPONSIVE */
         @media (max-width: 900px) {
-            .hero h1 { font-size: 1.6rem; }
-            .lessons-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            
+            .hero-stats {
+                gap: 20px;
+            }
+            
+            .hero-stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .lessons-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+            }
         }
+
         @media (max-width: 600px) {
-            .header { flex-wrap: wrap; gap: 8px; height: auto; padding: 10px 15px; }
-            .hero { padding: 30px 15px; }
-            .hero h1 { font-size: 1.3rem; }
-            .hero-stats { flex-direction: column; gap: 10px; }
-            .lessons-container { padding: 20px 15px; }
-            .lessons-grid { grid-template-columns: 1fr; gap: 12px; }
+            .header {
+                flex-wrap: wrap;
+                gap: 8px;
+                height: auto;
+                padding: 10px 15px;
+            }
+            
+            .hero {
+                padding: 30px 15px;
+            }
+            
+            .hero h1 {
+                font-size: 1.3rem;
+            }
+            
+            .hero p {
+                font-size: 0.9rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .lessons-container {
+                padding: 20px 15px;
+            }
+            
+            .lessons-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .lesson-card {
+                padding: 15px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            
+            .lesson-card-icon {
+                font-size: 1.5rem;
+                min-width: 40px;
+                text-align: center;
+            }
+            
+            .lesson-card-body {
+                flex: 1;
+            }
+            
+            .lesson-card-title {
+                font-size: 0.95rem;
+            }
+            
+            .lesson-card-desc {
+                font-size: 0.8rem;
+            }
+            
+            .lesson-card-footer {
+                margin-top: 10px;
+                padding-top: 10px;
+            }
         }
     </style>
 </head>
@@ -235,6 +313,21 @@
         document.addEventListener('DOMContentLoaded', function() {
             updateProgress();
             renderCards();
+        });
+        
+        // Preload Pyodide on hover over lesson cards
+        let pyodidePreloaded = false;
+        function preloadPyodide() {
+            if (pyodidePreloaded) return;
+            pyodidePreloaded = true;
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+            document.head.appendChild(script);
+        }
+        
+        document.getElementById('lessonsGrid').addEventListener('mouseover', function(e) {
+            const card = e.target.closest('.lesson-card');
+            if (card) preloadPyodide();
         });
     </script>
     <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js')}</script>

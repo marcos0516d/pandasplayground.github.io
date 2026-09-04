@@ -25,6 +25,7 @@
             background: var(--gris-claro);
             color: var(--texto);
             min-height: 100vh;
+            padding-top: 50px;
         }
 
         /* HEADER */
@@ -36,6 +37,11 @@
             align-items: center;
             justify-content: space-between;
             height: 50px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
         
         .header-logo {
@@ -465,6 +471,41 @@
             .level-card {
                 padding: 25px 20px;
             }
+            
+            .challenge-section {
+                padding: 0 15px 30px;
+            }
+            
+            .challenge-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 25px 20px;
+            }
+            
+            .challenge-title {
+                font-size: 1.3rem;
+            }
+            
+            .challenge-desc {
+                font-size: 0.9rem;
+            }
+            
+            .challenge-retos {
+                justify-content: center;
+            }
+            
+            .challenge-cta {
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid rgba(255,255,255,0.1);
+                width: 100%;
+            }
+            
+            .challenge-btn {
+                width: 100%;
+                padding: 14px;
+                font-size: 1rem;
+            }
         }
     </style>
     
@@ -611,7 +652,7 @@
         function updateBeginnerProgress() {
             const total = 14;
             const completed = JSON.parse(localStorage.getItem('pandasCompleted')) || [];
-            const done = completed.length;
+            const done = Math.min(completed.length, total);
             const pct = Math.round((done / total) * 100);
             
             document.getElementById('completedBeginner').textContent = done;
